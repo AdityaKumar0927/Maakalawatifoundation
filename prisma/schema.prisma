@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  OWNER
+  ADMIN
+}
+
+enum PatientStatus {
+  NEW
+  CONTACTED
+  SCHEDULED
+  SUPPORTED
+  CLOSED
+}
+
+enum ProjectCategory {
+  HEALTHCARE
+  EDUCATION
+  WOMEN_EMPOWERMENT
+  COMMUNITY_WELFARE
+}
+
+model AdminUser {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String
+  role        AdminRole    @default(ADMIN)
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  credentials Credential[]
+  sessions    Session[]
+}
+
+// A WebAuthn passkey. id is the base64url credential ID.
+model Credential {
+  id         String    @id
+  userId     String
+  user       AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  publicKey  Bytes
+  counter    Int       @default(0)
+  transports String    @default("")
+  deviceName String    @default("Passkey")
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+}
+
+// Server-side session. The cookie holds a random token; only its SHA-256
+// hash is stored, so a database leak does not leak usable sessions.
+model Session {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+}
+
+// Invitation for a new administrator, created by an OWNER. Stores only the
+// hash of the invite token.
+model AdminInvite {
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  email       String
+  role        AdminRole @default(ADMIN)
+  createdById String?
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  usedAt      DateTime?
+}
+
+// Bilingual editable site copy. Keys are enumerated in lib/content-keys.ts;
+// missing rows fall back to the built-in defaults, so the site renders fully
+// even with an empty database.
+model SiteContent {
+  key       String   @id
+  en        String
+  hi        String
+  updatedAt DateTime @updatedAt
+}
+
+// Non-bilingual configuration values (payment link, contact details, 80G
+// line, UPI VPA, social links...). Keys enumerated in lib/settings.ts.
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// Named image slots (hero, about, donate QR...) uploaded via the admin panel.
+model MediaSlot {
+  key       String   @id
+  url       String
+  alt       String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+model Announcement {
+  id        String    @id @default(cuid())
+  titleEn   String
+  titleHi   String
+  bodyEn    String    @default("")
+  bodyHi    String    @default("")
+  active    Boolean   @default(true)
+  startsAt  DateTime  @default(now())
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Event {
+  id         String    @id @default(cuid())
+  slug       String    @unique
+  titleEn    String
+  titleHi    String
+  summaryEn  String    @default("")
+  summaryHi  String    @default("")
+  bodyEn     String    @default("")
+  bodyHi     String    @default("")
+  locationEn String    @default("")
+  locationHi String    @default("")
+  startAt    DateTime
+  endAt      DateTime?
+  imageUrl   String?
+  imageAlt   String    @default("")
+  published  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Project {
+  id        String          @id @default(cuid())
+  slug      String          @unique
+  category  ProjectCategory
+  titleEn   String
+  titleHi   String
+  summaryEn String          @default("")
+  summaryHi String          @default("")
+  bodyEn    String          @default("")
+  bodyHi    String          @default("")
+  imageUrl  String?
+  imageAlt  String          @default("")
+  featured  Boolean         @default(false)
+  published Boolean         @default(false)
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+// A request for medical-care support, submitted from the public site with
+// DPDP-compliant consent. Data minimisation: only fields needed to provide
+// the support are collected; no IP addresses are stored.
+model PatientRegistration {
+  id                String        @id @default(cuid())
+  fullName          String
+  age               Int
+  gender            String
+  phone             String
+  city              String        @default("")
+  address           String        @default("")
+  need              String
+  preferredLanguage String        @default("hi")
+  // Parental/guardian consent — required when age < 18 (DPDP s.9, Rule 10).
+  guardianName      String?
+  guardianRelation  String?
+  guardianPhone     String?
+  guardianIdType    String?
+  guardianIdRef     String?
+  consentAt         DateTime      @default(now())
+  consentVersion    String
+  consentLanguage   String
+  status            PatientStatus @default(NEW)
+  notes             String        @default("")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+// A digitised entry from the physical visitor record book (OCR-assisted).
+model VisitorRecord {
+  id             String   @id @default(cuid())
+  visitDate      DateTime
+  name           String
+  phone          String   @default("")
+  address        String   @default("")
+  purpose        String   @default("")
+  notes          String   @default("")
+  sourceImageUrl String?
+  createdById    String?
+  createdAt      DateTime @default(now())
+}
+
+// Append-only security/audit log (DPDP Rule 6 expects logs kept ~1 year).
+// There is deliberately no update or delete path for this table in the app.
+model AuditLog {
+  id         String   @id @default(cuid())
+  at         DateTime @default(now())
+  actorEmail String   @default("system")
+  action     String
+  entity     String
+  entityId   String   @default("")
+  summary    String   @default("")
+}
+
+// Fixed-window rate limiting, keyed by a salted hash (never a raw IP).
+model RateLimitBucket {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+}

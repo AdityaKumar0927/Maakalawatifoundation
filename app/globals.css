@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Type ─────────────────────────────────────────────────────────── */
+  --font-sans: var(--font-mukta), "Nirmala UI", system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-tiro), Georgia, serif;
+
+  /* ── Palette: warm cream ground, marigold primary, forest support ── */
+  --color-cream-50: #fdfcf9;
+  --color-cream-100: #faf6ee;
+  --color-cream-200: #f4ecdc;
+  --color-cream-300: #eadec6;
+
+  --color-saffron-50: #fef7ee;
+  --color-saffron-100: #fcebd8;
+  --color-saffron-200: #f8d3ac;
+  --color-saffron-300: #f3b375;
+  --color-saffron-400: #ec8d40;
+  --color-saffron-500: #e06a1b;
+  --color-saffron-600: #c85312;
+  --color-saffron-700: #a63e10;
+  --color-saffron-800: #853312;
+  --color-saffron-900: #6c2b12;
+
+  --color-forest-50: #f1f7f3;
+  --color-forest-100: #dfede4;
+  --color-forest-200: #c0dbcb;
+  --color-forest-300: #95c0a6;
+  --color-forest-400: #649d7c;
+  --color-forest-500: #41805d;
+  --color-forest-600: #2e6749;
+  --color-forest-700: #26523c;
+  --color-forest-800: #204231;
+  --color-forest-900: #1b3729;
+
+  --color-ink: #262019;
+  --color-ink-soft: #5a5142;
+  --color-ink-faint: #8a7f68;
+  --color-line: #e9dfc9;
+  --color-gold: #b98a2f;
+
+  /* Category accents (pillars / project chips) */
+  --color-cat-health: #b04437;
+  --color-cat-health-soft: #f9ece9;
+  --color-cat-edu: #2e6749;
+  --color-cat-edu-soft: #eaf3ee;
+  --color-cat-women: #9c4a78;
+  --color-cat-women-soft: #f8edf3;
+  --color-cat-comm: #7a5c3e;
+  --color-cat-comm-soft: #f5efe7;
+
+  /* ── Depth ────────────────────────────────────────────────────────── */
+  --shadow-soft:
+    0 1px 2px rgb(38 32 25 / 0.05), 0 8px 24px -8px rgb(38 32 25 / 0.12);
+  --shadow-lift:
+    0 2px 4px rgb(38 32 25 / 0.06), 0 18px 44px -14px rgb(38 32 25 / 0.2);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream-100);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-saffron-200);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-saffron-600);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ── Devanagari typography ─────────────────────────────────────────
+     No synthesized bold/italic (smears matras & conjuncts), no letter
+     spacing (breaks inside conjuncts), taller leading (stacked matras),
+     and a slightly larger base size (Devanagari reads smaller). */
+  :lang(hi) {
+    font-synthesis: none;
+    letter-spacing: normal !important;
+    font-style: normal;
+  }
+
+  html[lang="hi"] {
+    font-size: 106.25%;
+  }
+
+  html[lang="hi"] body {
+    line-height: 1.75;
+  }
+
+  html[lang="hi"] h1,
+  html[lang="hi"] h2,
+  html[lang="hi"] h3,
+  html[lang="hi"] h4 {
+    line-height: 1.35;
+  }
+
+  html[lang="hi"] .font-display {
+    font-family: var(--font-tiro), var(--font-fraunces), Georgia, serif;
+  }
+}
+
+@utility bg-motif {
+  /* Quiet kantha-stitch dot grid on the cream ground. */
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgb(38 32 25 / 0.055) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}

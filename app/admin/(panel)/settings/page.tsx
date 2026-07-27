@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { requireAdminPage } from "@/lib/guard";
-import { settingDefs } from "@/lib/settings";
+import { settingDefList } from "@/lib/settings";
 import { AdminPage, Card, ErrorBanner, Label, SavedBanner, inputCls } from "@/components/admin/ui";
 import { SubmitButton } from "@/components/admin/buttons";
 import { saveSettings } from "@/app/admin/(panel)/settings/actions";
@@ -35,7 +35,7 @@ export default async function SettingsPage({
       )}
       <Card>
         <form action={saveSettings} className="space-y-5">
-          {settingDefs.map((def) => (
+          {settingDefList.map((def) => (
             <div key={def.key}>
               <Label htmlFor={def.key}>{def.label}</Label>
               <input

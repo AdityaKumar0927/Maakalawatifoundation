@@ -49,7 +49,7 @@ export async function uploadImage(file: File, prefix: string): Promise<string> {
   if (!sig) throw new UploadError("Only JPEG, PNG or WebP images are allowed.");
 
   const safePrefix = prefix.replace(/[^a-z0-9-]/gi, "").slice(0, 30) || "media";
-  const blob = await put(`${safePrefix}/${randomUUID()}.${sig.ext}`, bytes, {
+  const blob = await put(`${safePrefix}/${randomUUID()}.${sig.ext}`, Buffer.from(bytes), {
     access: "public",
     contentType: sig.type,
     addRandomSuffix: false,

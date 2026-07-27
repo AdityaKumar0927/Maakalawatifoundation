@@ -39,7 +39,7 @@ export default async function DonatePage({
     : "";
   const linkText = d.linkText.replace("{gateway}", gatewayNote);
 
-  const tiers = [1, 2, 3]
+  const tiers = ([1, 2, 3] as const)
     .map((i) => ({
       amount: copy[`donate.impact${i}.amount`],
       text: copy[`donate.impact${i}.text`],

@@ -23,7 +23,7 @@ export interface ContentKeyDef {
   multiline?: boolean;
 }
 
-export const contentKeys: ContentKeyDef[] = [
+export const contentKeys = [
   { key: "hero.badge", group: "Hero", label: "Small badge above the headline" },
   { key: "hero.title", group: "Hero", label: "Headline" },
   { key: "hero.subtitle", group: "Hero", label: "Sub-headline", multiline: true },
@@ -72,6 +72,11 @@ export const contentKeys: ContentKeyDef[] = [
 
   { key: "contact.address", group: "Contact", label: "Postal address", multiline: true },
   { key: "contact.landmark", group: "Contact", label: "Landmark / how to reach" },
-];
+] as const satisfies readonly ContentKeyDef[];
 
-export const contentKeySet = new Set(contentKeys.map((k) => k.key));
+export type ContentKey = (typeof contentKeys)[number]["key"];
+
+/** Wide-typed view for consumers that read optional fields (e.g. multiline). */
+export const contentKeyDefs: readonly ContentKeyDef[] = contentKeys;
+
+export const contentKeySet: ReadonlySet<string> = new Set(contentKeys.map((k) => k.key));

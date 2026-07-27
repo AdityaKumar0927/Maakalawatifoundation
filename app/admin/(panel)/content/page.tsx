@@ -1,6 +1,6 @@
 import { requireAdminPage } from "@/lib/guard";
 import { getContentForAdmin } from "@/lib/content";
-import { contentKeys, type ContentGroup } from "@/lib/content-keys";
+import { contentKeyDefs, type ContentGroup } from "@/lib/content-keys";
 import { AdminPage, Card, Label, SavedBanner, inputCls } from "@/components/admin/ui";
 import { SubmitButton } from "@/components/admin/buttons";
 import { saveContentGroup } from "@/app/admin/(panel)/content/actions";
@@ -17,7 +17,7 @@ export default async function ContentPage({
   const rows = await getContentForAdmin();
   const byKey = new Map(rows.map((r) => [r.key, r]));
 
-  const groups = [...new Set(contentKeys.map((k) => k.group))] as ContentGroup[];
+  const groups = [...new Set(contentKeyDefs.map((k) => k.group))] as ContentGroup[];
 
   return (
     <AdminPage title="Site content">
@@ -34,7 +34,7 @@ export default async function ContentPage({
               <input type="hidden" name="group" value={group} />
               <h2 className="font-display text-xl text-ink">{group}</h2>
               <div className="mt-4 space-y-5">
-                {contentKeys
+                {contentKeyDefs
                   .filter((k) => k.group === group)
                   .map((def) => {
                     const row = byKey.get(def.key);

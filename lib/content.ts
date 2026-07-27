@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { prisma } from "@/lib/db";
-import { contentKeys } from "@/lib/content-keys";
+import { contentKeys, type ContentKey } from "@/lib/content-keys";
 import { getDict, type Locale } from "@/lib/i18n";
 
 /**
@@ -19,13 +19,13 @@ const getOverrides = cache(async (): Promise<Map<string, { en: string; hi: strin
   }
 });
 
-export type SiteCopy = Record<string, string>;
+export type SiteCopy = Record<ContentKey, string>;
 
 export const getContent = cache(async (locale: Locale): Promise<SiteCopy> => {
   const dict = getDict(locale);
   const defaults = dict.content as Record<string, string>;
   const overrides = await getOverrides();
-  const out: SiteCopy = {};
+  const out = {} as SiteCopy;
   for (const def of contentKeys) {
     const override = overrides.get(def.key);
     const value = locale === "hi" ? override?.hi : override?.en;

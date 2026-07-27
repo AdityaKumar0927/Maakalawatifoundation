@@ -28,7 +28,7 @@ export default async function HomePage({
   const hero = media.get("hero");
   const story = media.get("story");
 
-  const stats = [1, 2, 3, 4]
+  const stats = ([1, 2, 3, 4] as const)
     .map((i) => ({ value: copy[`stats.${i}.value`], label: copy[`stats.${i}.label`] }))
     .filter((s) => s.value && s.label);
 

@@ -11,7 +11,7 @@ export const pillarOrder = [
 
 export const pillarStyle: Record<
   ProjectCategory,
-  { fg: string; bg: string; contentKey: string }
+  { fg: string; bg: string; contentKey: "healthcare" | "education" | "women" | "community" }
 > = {
   HEALTHCARE: {
     fg: "var(--color-cat-health)",

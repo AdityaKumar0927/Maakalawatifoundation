@@ -17,7 +17,7 @@ export interface SettingDef {
   kind: "text" | "url" | "email" | "phone" | "upi";
 }
 
-export const settingDefs: SettingDef[] = [
+export const settingDefs = [
   {
     key: "paymentUrl",
     label: "Donation payment link",
@@ -87,19 +87,24 @@ export const settingDefs: SettingDef[] = [
   { key: "facebook", label: "Facebook page URL", defaultValue: "", kind: "url" },
   { key: "instagram", label: "Instagram URL", defaultValue: "", kind: "url" },
   { key: "youtube", label: "YouTube URL", defaultValue: "", kind: "url" },
-];
+] as const satisfies readonly SettingDef[];
 
-export const settingKeySet = new Set(settingDefs.map((d) => d.key));
+export type SettingKey = (typeof settingDefs)[number]["key"];
+export type Settings = Record<SettingKey, string>;
 
-export type Settings = Record<string, string>;
+/** Wide-typed view for consumers that read optional fields (e.g. help). */
+export const settingDefList: readonly SettingDef[] = settingDefs;
+
+export const settingKeySet: ReadonlySet<string> = new Set(settingDefs.map((d) => d.key));
 
 export const getSettings = cache(async (): Promise<Settings> => {
-  const out: Settings = {};
-  for (const def of settingDefs) out[def.key] = def.defaultValue;
+  const out = Object.fromEntries(
+    settingDefs.map((def) => [def.key, def.defaultValue])
+  ) as Record<SettingKey, string>;
   try {
     const rows = await prisma.setting.findMany();
     for (const row of rows) {
-      if (settingKeySet.has(row.key) && row.value) out[row.key] = row.value;
+      if (settingKeySet.has(row.key) && row.value) out[row.key as SettingKey] = row.value;
     }
   } catch {
     // defaults already applied

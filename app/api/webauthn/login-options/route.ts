@@ -8,8 +8,11 @@ export async function POST(request: Request): Promise<Response> {
   if (!hasValidOrigin(request)) {
     return Response.json({ error: "Bad origin" }, { status: 403 });
   }
-  if (!(await rateLimit("webauthn-login", 20, 900))) {
-    return Response.json({ error: "Too many attempts" }, { status: 429 });
+  const limit = await rateLimit("webauthn-login", 20, 900);
+  if (limit !== "ok") {
+    return limit === "limited"
+      ? Response.json({ error: "Too many attempts — wait a while" }, { status: 429 })
+      : Response.json({ error: "Temporarily unavailable — try again shortly" }, { status: 503 });
   }
 
   // Usernameless: discoverable credentials — the browser shows the account

@@ -210,7 +210,7 @@
     "guardianIdHelp": "Sharing an ID detail is voluntary. It helps us verify guardian consent as the law requires. Never share full Aadhaar numbers.",
     "noticeTitle": "How we use your information",
     "noticeIntro": "This notice is given under the Digital Personal Data Protection Act, 2023. It is also available in Hindi — use the language switch at the top of the page.",
-    "noticeData": "What we collect: name, age, gender, mobile number, city, address (optional), and your description of the medical help needed. For patients under 18, we also collect the parent/guardian details above.",
+    "noticeData": "What we collect: name, age, gender, mobile number, city, address (optional), your preferred language for our call, and your description of the medical help needed. For patients under 18, we also collect the parent/guardian details above.",
     "noticePurpose": "Why we collect it: only to review your request, contact you, and arrange the medical support you asked for. We do not use it for marketing. We share it only with the medical partners directly involved in arranging your care.",
     "noticeRetention": "How long we keep it: while your request is active and for up to one year after it closes, after which it is deleted.",
     "noticeRights": "Your rights: you may ask to see, correct or delete your information, withdraw consent at any time (as easily as you gave it), or nominate someone to exercise these rights for you. Contact our grievance contact (details in the footer and Privacy Policy); we respond within {days} days. If you are not satisfied, you may complain to the Data Protection Board of India.",

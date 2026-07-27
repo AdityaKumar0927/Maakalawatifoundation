@@ -85,6 +85,8 @@ export function proxy(request: NextRequest): NextResponse {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  // Lets error boundaries (e.g. the 404 page) recover the request's locale.
+  requestHeaders.set("x-pathname", pathname);
   requestHeaders.set("Content-Security-Policy", csp);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });

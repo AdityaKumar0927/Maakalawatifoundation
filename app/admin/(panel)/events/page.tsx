@@ -22,6 +22,15 @@ const ERRORS: Record<string, string> = {
   missing: "That event no longer exists.",
 };
 
+function describeError(error: string): string {
+  if (ERRORS[error]) return ERRORS[error];
+  try {
+    return decodeURIComponent(error);
+  } catch {
+    return error;
+  }
+}
+
 export default async function EventsAdminPage({
   searchParams,
 }: {
@@ -34,7 +43,7 @@ export default async function EventsAdminPage({
   return (
     <AdminPage title="Events" action={<PrimaryLink href="/admin/events/new">+ New event</PrimaryLink>}>
       {saved && <SavedBanner message="Event saved." />}
-      {error && <ErrorBanner message={ERRORS[error] ?? decodeURIComponent(error)} />}
+      {error && <ErrorBanner message={describeError(error)} />}
 
       {events.length === 0 ? (
         <EmptyState>No events yet — create the first one.</EmptyState>

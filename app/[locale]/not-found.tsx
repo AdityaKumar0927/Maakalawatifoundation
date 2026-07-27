@@ -1,12 +1,18 @@
 import Link from "next/link";
-import { headers } from "next/headers";
-import { getDict, isLocale, type Locale } from "@/lib/i18n";
+import { cookies, headers } from "next/headers";
+import { getDict, isLocale, LOCALE_COOKIE, type Locale } from "@/lib/i18n";
 
 export default async function NotFound() {
-  // not-found boundaries receive no params; recover the locale from the URL.
-  const h = await headers();
-  const referer = h.get("x-invoke-path") ?? "";
-  const locale: Locale = isLocale(referer.split("/")[1]) ? (referer.split("/")[1] as Locale) : "en";
+  // not-found boundaries receive no params; recover the locale from the
+  // x-pathname header set by proxy.ts, falling back to the locale cookie.
+  const [h, jar] = await Promise.all([headers(), cookies()]);
+  const fromPath = (h.get("x-pathname") ?? "").split("/")[1];
+  const fromCookie = jar.get(LOCALE_COOKIE)?.value;
+  const locale: Locale = isLocale(fromPath)
+    ? fromPath
+    : isLocale(fromCookie)
+      ? fromCookie
+      : "en";
   const dict = getDict(locale);
 
   return (

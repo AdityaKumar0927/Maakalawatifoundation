@@ -53,7 +53,15 @@ export async function consumeChallenge(
 ): Promise<ChallengePayload | null> {
   const jar = await cookies();
   const token = jar.get(CHALLENGE_COOKIE)?.value;
-  jar.delete(CHALLENGE_COOKIE);
+  // __Host- cookies can only be cleared by a Set-Cookie that itself satisfies
+  // the __Host- rules (Secure, Path=/), so expire it explicitly.
+  jar.set(CHALLENGE_COOKIE, "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secretKey());

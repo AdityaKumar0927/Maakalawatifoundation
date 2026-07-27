@@ -28,16 +28,18 @@ export async function rateLimitKey(scope: string): Promise<string> {
   return `${scope}:${digest}`;
 }
 
+export type RateLimitResult = "ok" | "limited" | "unavailable";
+
 /**
- * Consume one hit from the bucket. Returns true when allowed.
- * Fails CLOSED (denies) if the database is unreachable — a throttle that
- * silently disappears under failure would defeat its purpose.
+ * Consume one hit from the bucket. Fails CLOSED when the database is
+ * unreachable — but reports that as "unavailable" so callers can show an
+ * honest error instead of a bogus "too many requests".
  */
 export async function rateLimit(
   scope: string,
   max: number,
   windowSeconds: number
-): Promise<boolean> {
+): Promise<RateLimitResult> {
   const key = await rateLimitKey(scope);
   const now = new Date();
   const resetAt = new Date(now.getTime() + windowSeconds * 1000);
@@ -49,15 +51,15 @@ export async function rateLimit(
         create: { key, count: 1, resetAt },
         update: { count: 1, resetAt },
       });
-      return true;
+      return "ok";
     }
-    if (bucket.count >= max) return false;
+    if (bucket.count >= max) return "limited";
     await prisma.rateLimitBucket.update({
       where: { key },
       data: { count: { increment: 1 } },
     });
-    return true;
+    return "ok";
   } catch {
-    return false;
+    return "unavailable";
   }
 }

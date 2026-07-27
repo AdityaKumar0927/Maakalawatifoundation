@@ -44,7 +44,15 @@ export async function destroySession(): Promise<void> {
       data: { revokedAt: new Date() },
     });
   }
-  jar.delete(SESSION_COOKIE);
+  // __Host- cookies can only be cleared by a Set-Cookie that itself satisfies
+  // the __Host- rules (Secure, Path=/), so expire it explicitly.
+  jar.set(SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 /** Revoke every session of a user (e.g. when deactivated or removed). */

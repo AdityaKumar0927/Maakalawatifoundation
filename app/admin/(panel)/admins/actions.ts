@@ -8,6 +8,7 @@ import { audit } from "@/lib/audit";
 import { requireAdminAction } from "@/lib/guard";
 import { hashToken, revokeAllSessions } from "@/lib/session";
 
+
 const inviteSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.string().email().max(200)),
   role: z.enum(["ADMIN", "OWNER"]),
@@ -86,12 +87,15 @@ export async function deleteCredential(formData: FormData): Promise<void> {
       if (count <= 1) redirect("/admin/admins?error=last-key");
     }
     await prisma.credential.delete({ where: { id } });
+    // A passkey is usually removed because it may be compromised — cut off
+    // any session that could have been started with it.
+    await revokeAllSessions(credential.userId);
     await audit({
       actorEmail: owner.email,
       action: "admin.credential_delete",
       entity: "Credential",
       entityId: id,
-      summary: `Removed passkey "${credential.deviceName}"`,
+      summary: `Removed passkey "${credential.deviceName}" and revoked the user's sessions`,
     });
   }
   redirect("/admin/admins?saved=1");

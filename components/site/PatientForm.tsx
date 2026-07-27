@@ -168,7 +168,11 @@ export function PatientForm({
       </fieldset>
 
       {isMinor && (
-        <fieldset className="space-y-5 rounded-3xl border border-saffron-200 bg-saffron-50 p-6">
+        <fieldset
+          className={`space-y-5 rounded-3xl border bg-saffron-50 p-6 ${
+            bad("guardianConsent") ? "border-cat-health ring-2 ring-cat-health/40" : "border-saffron-200"
+          }`}
+        >
           <legend className="font-display px-2 text-xl text-saffron-900">
             {p.guardianHeading}
           </legend>
@@ -214,11 +218,20 @@ export function PatientForm({
             />
             <span>{p.guardianConsentLabel}</span>
           </label>
+          {bad("guardianConsent") && (
+            <p role="alert" className="text-sm font-semibold text-cat-health">
+              ⚠ {p.errorValidation}
+            </p>
+          )}
         </fieldset>
       )}
 
       {/* DPDP standalone notice + consent */}
-      <div className="rounded-3xl border border-forest-200 bg-forest-50 p-6">
+      <div
+        className={`rounded-3xl border bg-forest-50 p-6 ${
+          bad("consent") ? "border-cat-health ring-2 ring-cat-health/40" : "border-forest-200"
+        }`}
+      >
         <h2 className="font-display text-xl text-forest-800">{p.noticeTitle}</h2>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-forest-900">
           <p>{p.noticeIntro}</p>
@@ -236,6 +249,11 @@ export function PatientForm({
           />
           <span>{p.consentLabel}</span>
         </label>
+        {bad("consent") && (
+          <p role="alert" className="mt-2 text-sm font-semibold text-cat-health">
+            ⚠ {p.errorValidation}
+          </p>
+        )}
       </div>
 
       <button

@@ -19,7 +19,13 @@ export default async function NewVisitorsPage({
           message={
             error === "rows"
               ? "Please check the rows — every record needs a name and a valid date."
-              : decodeURIComponent(error)
+              : (() => {
+                  try {
+                    return decodeURIComponent(error);
+                  } catch {
+                    return error;
+                  }
+                })()
           }
         />
       )}

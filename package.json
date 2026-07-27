@@ -8,8 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/copy-ocr-assets.mjs",
-    "build": "prisma generate && next build",
+    "build": "node scripts/copy-ocr-assets.mjs && prisma generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",

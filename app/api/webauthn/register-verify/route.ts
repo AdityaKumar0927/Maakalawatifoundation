@@ -14,8 +14,11 @@ export async function POST(request: Request): Promise<Response> {
   if (!hasValidOrigin(request)) {
     return Response.json({ error: "Bad origin" }, { status: 403 });
   }
-  if (!(await rateLimit("webauthn-reg", 10, 3600))) {
-    return Response.json({ error: "Too many attempts" }, { status: 429 });
+  const limit = await rateLimit("webauthn-reg", 10, 3600);
+  if (limit !== "ok") {
+    return limit === "limited"
+      ? Response.json({ error: "Too many attempts — wait a while" }, { status: 429 })
+      : Response.json({ error: "Temporarily unavailable — try again shortly" }, { status: 503 });
   }
 
   const challenge = await consumeChallenge("registration");
@@ -68,8 +71,9 @@ export async function POST(request: Request): Promise<Response> {
       role: challenge.role,
       active: true,
     },
-    // Existing account (owner recovery / added passkey): never touch role here.
-    update: {},
+    // An OWNER-issued invite explicitly grants its role (this is the only
+    // promotion path); setup-token recovery and add-passkey never touch it.
+    update: challenge.inviteId ? { role: challenge.role } : {},
   });
 
   if (!user.active) {
@@ -95,12 +99,17 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   await createSession(user.id);
+  const via = challenge.inviteId
+    ? "via invite"
+    : challenge.existingUserId
+      ? "self-service"
+      : "via SETUP TOKEN";
   await audit({
     actorEmail: user.email,
     action: "auth.passkey_enrolled",
     entity: "AdminUser",
     entityId: user.id,
-    summary: `Passkey enrolled (${deviceName})`,
+    summary: `Passkey enrolled (${deviceName}, ${via}, role ${user.role})`,
   });
 
   return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });

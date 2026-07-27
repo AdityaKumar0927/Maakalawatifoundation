@@ -95,8 +95,17 @@ export function OcrWorkbench() {
       if (attach && file) formData.set("sourceImage", file);
       await saveVisitorRecords(formData); // redirects on success
     } catch (e) {
-      // Next redirects surface as a special error — anything else is real.
-      if (e && typeof e === "object" && "digest" in e) throw e;
+      // Next navigations surface as errors with a NEXT_* digest — rethrow
+      // only those; every real failure must reach the user as feedback.
+      if (
+        e &&
+        typeof e === "object" &&
+        "digest" in e &&
+        typeof (e as { digest: unknown }).digest === "string" &&
+        (e as { digest: string }).digest.startsWith("NEXT_")
+      ) {
+        throw e;
+      }
       setSaveError("Saving failed. Please try again.");
       setSaving(false);
     }

@@ -7,7 +7,7 @@ import { audit } from "@/lib/audit";
 import { requireAdminAction } from "@/lib/guard";
 import { cleanText } from "@/lib/validation";
 import { parseISTDateTime } from "@/lib/utils";
-import { UploadError, uploadImage } from "@/lib/upload";
+import { UploadError, deleteImage, uploadImage } from "@/lib/upload";
 
 const rowSchema = z.object({
   visitDate: z.string().min(1),
@@ -73,13 +73,24 @@ export async function deleteVisitorRecord(formData: FormData): Promise<void> {
   const user = await requireAdminAction();
   const id = String(formData.get("id") ?? "");
   if (id) {
-    await prisma.visitorRecord.delete({ where: { id } }).catch(() => {});
-    await audit({
-      actorEmail: user.email,
-      action: "visitor.delete",
-      entity: "VisitorRecord",
-      entityId: id,
-    });
+    const record = await prisma.visitorRecord.findUnique({ where: { id } });
+    if (record) {
+      await prisma.visitorRecord.delete({ where: { id } });
+      // Records digitised from the same page share one photo — remove the
+      // blob only when no other record still references it.
+      if (record.sourceImageUrl) {
+        const stillUsed = await prisma.visitorRecord.count({
+          where: { sourceImageUrl: record.sourceImageUrl },
+        });
+        if (stillUsed === 0) await deleteImage(record.sourceImageUrl);
+      }
+      await audit({
+        actorEmail: user.email,
+        action: "visitor.delete",
+        entity: "VisitorRecord",
+        entityId: id,
+      });
+    }
   }
   redirect("/admin/visitors?saved=1");
 }

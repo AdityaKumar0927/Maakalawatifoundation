@@ -28,6 +28,15 @@ const ERRORS: Record<string, string> = {
   missing: "That project no longer exists.",
 };
 
+function describeError(error: string): string {
+  if (ERRORS[error]) return ERRORS[error];
+  try {
+    return decodeURIComponent(error);
+  } catch {
+    return error;
+  }
+}
+
 export default async function ProjectsAdminPage({
   searchParams,
 }: {
@@ -45,7 +54,7 @@ export default async function ProjectsAdminPage({
       action={<PrimaryLink href="/admin/projects/new">+ New project</PrimaryLink>}
     >
       {saved && <SavedBanner message="Project saved." />}
-      {error && <ErrorBanner message={ERRORS[error] ?? decodeURIComponent(error)} />}
+      {error && <ErrorBanner message={describeError(error)} />}
 
       {projects.length === 0 ? (
         <EmptyState>

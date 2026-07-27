@@ -26,6 +26,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: {
+    serverActions: {
+      // Image uploads travel through server actions; lib/upload.ts enforces
+      // the real 5 MB cap — this only leaves multipart headroom above it.
+      bodySizeLimit: "8mb",
+    },
+  },
   images: {
     remotePatterns: [
       // Admin-uploaded media lives in Vercel Blob.

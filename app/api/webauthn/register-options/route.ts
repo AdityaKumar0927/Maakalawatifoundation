@@ -1,7 +1,7 @@
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { appOrigin, rpID } from "@/lib/env";
+import { rpID } from "@/lib/env";
 import { getAdminForRequest, hasValidOrigin } from "@/lib/guard";
 import { hashToken } from "@/lib/session";
 import { rateLimit } from "@/lib/rate-limit";
@@ -30,8 +30,11 @@ export async function POST(request: Request): Promise<Response> {
   if (!hasValidOrigin(request)) {
     return Response.json({ error: "Bad origin" }, { status: 403 });
   }
-  if (!(await rateLimit("webauthn-reg", 10, 3600))) {
-    return Response.json({ error: "Too many attempts" }, { status: 429 });
+  const limit = await rateLimit("webauthn-reg", 10, 3600);
+  if (limit !== "ok") {
+    return limit === "limited"
+      ? Response.json({ error: "Too many attempts — wait a while" }, { status: 429 })
+      : Response.json({ error: "Temporarily unavailable — try again shortly" }, { status: 503 });
   }
 
   let parsed;

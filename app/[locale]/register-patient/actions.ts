@@ -17,8 +17,9 @@ export async function submitPatientRegistration(
 ): Promise<PatientFormState> {
   try {
     // Throttle before any work: 5 submissions/hour per (salted, hashed) IP.
-    const allowed = await rateLimit("patient", 5, 3600);
-    if (!allowed) return { status: "error", code: "rate" };
+    const limit = await rateLimit("patient", 5, 3600);
+    if (limit === "limited") return { status: "error", code: "rate" };
+    if (limit === "unavailable") return { status: "error", code: "generic" };
 
     const raw = Object.fromEntries(formData.entries());
     const parsed = patientSchema.safeParse(raw);

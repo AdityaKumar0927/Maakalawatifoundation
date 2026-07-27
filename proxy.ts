@@ -14,18 +14,14 @@ import { LOCALE_COOKIE, isLocale } from "@/lib/locales";
  *    action and every admin route handler (deny by default).
  */
 
-const PUBLIC_PATHS = new Set([
-  "/about",
-  "/work",
-  "/events",
-  "/donate",
-  "/register-patient",
-  "/contact",
-  "/privacy",
-  "/terms",
-]);
-
 const ADMIN_OPEN_PREFIXES = ["/admin/login", "/admin/setup"];
+
+/** Path prefixes that must never be locale-prefixed. */
+const NON_LOCALE_PREFIXES = ["/en", "/hi", "/admin", "/api", "/set-locale"];
+
+function hasPrefix(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
 
 function buildCsp(nonce: string, isAdminArea: boolean): string {
   const dev = process.env.NODE_ENV === "development";
@@ -64,15 +60,11 @@ export function proxy(request: NextRequest): NextResponse {
       return NextResponse.redirect(new URL(`/${saved}`, request.url));
     }
     // fall through: render the language chooser at "/"
-  } else {
-    const bare = [...PUBLIC_PATHS].find(
-      (p) => pathname === p || pathname.startsWith(`${p}/`)
-    );
-    if (bare) {
-      const saved = request.cookies.get(LOCALE_COOKIE)?.value;
-      const locale = isLocale(saved) ? saved : "en";
-      return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
-    }
+  } else if (!NON_LOCALE_PREFIXES.some((p) => hasPrefix(pathname, p))) {
+    // Bare public path (e.g. /about) → send into the visitor's locale.
+    const saved = request.cookies.get(LOCALE_COOKIE)?.value;
+    const locale = isLocale(saved) ? saved : "en";
+    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
   }
 
   // ── Admin outer fence ─────────────────────────────────────────────────

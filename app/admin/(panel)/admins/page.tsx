@@ -27,6 +27,8 @@ const ERRORS: Record<string, string> = {
   invite: "Please enter a valid email address.",
   self: "You cannot deactivate your own account.",
   "last-key": "You cannot remove your own last passkey — add another one first.",
+  "not-allowed":
+    "That email is not on the administrator allow-list (set in lib/admin-allowlist.ts or the ADMIN_ALLOWED_EMAILS environment variable).",
 };
 
 export default async function AdminsPage({

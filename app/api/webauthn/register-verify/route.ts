@@ -9,6 +9,7 @@ import { hasValidOrigin } from "@/lib/guard";
 import { createSession } from "@/lib/session";
 import { rateLimit } from "@/lib/rate-limit";
 import { consumeChallenge } from "@/lib/webauthn";
+import { isAllowedAdminEmail } from "@/lib/admin-allowlist";
 
 export async function POST(request: Request): Promise<Response> {
   if (!hasValidOrigin(request)) {
@@ -24,6 +25,12 @@ export async function POST(request: Request): Promise<Response> {
   const challenge = await consumeChallenge("registration");
   if (!challenge || !challenge.email || !challenge.name || !challenge.role) {
     return Response.json({ error: "Challenge expired — try again" }, { status: 400 });
+  }
+  if (!isAllowedAdminEmail(challenge.email)) {
+    return Response.json(
+      { error: "This email is not authorised to administer this site" },
+      { status: 403 }
+    );
   }
 
   let payload: { response: RegistrationResponseJSON; deviceName?: string };

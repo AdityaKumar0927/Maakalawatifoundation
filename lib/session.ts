@@ -4,6 +4,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import type { AdminRole, AdminUser } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { isAllowedAdminEmail } from "@/lib/admin-allowlist";
 
 /**
  * Session model: the browser holds a random 256-bit opaque token in a
@@ -79,6 +80,7 @@ export const getSessionUser = cache(async (): Promise<AdminUser | null> => {
     if (!session) return null;
     if (session.revokedAt || session.expiresAt < new Date()) return null;
     if (!session.user.active) return null;
+    if (!isAllowedAdminEmail(session.user.email)) return null;
     return session.user;
   } catch {
     return null;

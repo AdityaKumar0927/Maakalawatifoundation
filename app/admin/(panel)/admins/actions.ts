@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { requireAdminAction } from "@/lib/guard";
 import { hashToken, revokeAllSessions } from "@/lib/session";
+import { isAllowedAdminEmail } from "@/lib/admin-allowlist";
 
 
 const inviteSchema = z.object({
@@ -19,6 +20,7 @@ export async function createInvite(formData: FormData): Promise<void> {
   const parsed = inviteSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) redirect("/admin/admins?error=invite");
   const { email, role } = parsed.data;
+  if (!isAllowedAdminEmail(email)) redirect("/admin/admins?error=not-allowed");
 
   const token = randomBytes(24).toString("base64url");
   await prisma.adminInvite.create({

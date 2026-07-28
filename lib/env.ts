@@ -13,9 +13,12 @@ export function appOrigin(): string {
   return raw.replace(/\/+$/, "");
 }
 
-/** WebAuthn Relying Party ID — the registrable domain of the site. */
+/**
+ * WebAuthn Relying Party ID — the registrable domain of the site.
+ * "www." is stripped so passkeys work on both www and the apex domain.
+ */
 export function rpID(): string {
-  return new URL(appOrigin()).hostname;
+  return new URL(appOrigin()).hostname.replace(/^www\./, "");
 }
 
 export function isProduction(): boolean {

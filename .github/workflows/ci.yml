@@ -32,5 +32,7 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # `npm run build` includes `prisma db push` (schema sync on deploy);
+      # CI has no database, so run the underlying steps without it.
       - name: Build
-        run: npm run build
+        run: node scripts/copy-ocr-assets.mjs && npx next build

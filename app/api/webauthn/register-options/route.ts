@@ -6,6 +6,7 @@ import { getAdminForRequest, hasValidOrigin } from "@/lib/guard";
 import { hashToken } from "@/lib/session";
 import { rateLimit } from "@/lib/rate-limit";
 import { safeEqual, storeChallenge } from "@/lib/webauthn";
+import { isAllowedAdminEmail } from "@/lib/admin-allowlist";
 
 const RP_NAME = "Maa Kalawati Foundation";
 
@@ -59,6 +60,12 @@ export async function POST(request: Request): Promise<Response> {
     const expected = process.env.ADMIN_SETUP_TOKEN;
     if (!expected || expected.length < 16 || !safeEqual(body.token, expected)) {
       return Response.json({ error: "Invalid token" }, { status: 403 });
+    }
+    if (!isAllowedAdminEmail(body.email)) {
+      return Response.json(
+        { error: "This email is not authorised to administer this site" },
+        { status: 403 }
+      );
     }
     email = body.email;
     name = body.name;

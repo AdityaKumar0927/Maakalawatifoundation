@@ -35,8 +35,18 @@ export default async function MediaPage({
               {slot.help && <p className="mt-1 text-xs text-ink-faint">{slot.help}</p>}
 
               {current ? (
-                <div className="relative mt-4 aspect-[3/2] overflow-hidden rounded-xl border border-line">
-                  <Image src={current.url} alt={current.alt} fill sizes="400px" className="object-cover" />
+                <div
+                  className={`relative mt-4 aspect-[3/2] overflow-hidden rounded-xl border border-line ${
+                    slot.contain ? "bg-white" : ""
+                  }`}
+                >
+                  <Image
+                    src={current.url}
+                    alt={current.alt}
+                    fill
+                    sizes="400px"
+                    className={slot.contain ? "object-contain p-4" : "object-cover"}
+                  />
                 </div>
               ) : (
                 <p className="bg-motif mt-4 flex aspect-[3/2] items-center justify-center rounded-xl border border-dashed border-line text-sm text-ink-faint">

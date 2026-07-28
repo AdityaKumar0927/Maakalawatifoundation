@@ -8,7 +8,7 @@ import { getFeaturedProjects, getUpcomingEvents } from "@/lib/public-data";
 import { SectionHeading, SectionLink } from "@/components/site/Section";
 import { EventCard, ProjectCard } from "@/components/site/cards";
 import { PillarIcon, pillarOrder, pillarStyle } from "@/components/site/pillars";
-import { Logo } from "@/components/site/Logo";
+import { SiteMark } from "@/components/site/SiteMark";
 
 export default async function HomePage({
   params,
@@ -89,7 +89,7 @@ export default async function HomePage({
                 <div className="absolute inset-8 rounded-full border border-saffron-200/80" />
                 <div className="absolute inset-16 rounded-full border border-forest-200" />
                 <div className="flex h-40 w-40 items-center justify-center rounded-full bg-white shadow-lift sm:h-48 sm:w-48">
-                  <Logo size={110} />
+                  <SiteMark size={110} />
                 </div>
               </div>
             )}
@@ -183,7 +183,7 @@ export default async function HomePage({
                   aria-hidden
                   className="bg-motif flex aspect-square items-center justify-center rounded-3xl border border-line bg-saffron-50"
                 >
-                  <Logo size={90} />
+                  <SiteMark size={90} />
                 </div>
               )}
             </div>

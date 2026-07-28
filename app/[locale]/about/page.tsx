@@ -7,7 +7,7 @@ import { getMedia } from "@/lib/media";
 import { getSettings } from "@/lib/settings";
 import { SectionHeading } from "@/components/site/Section";
 import { PillarIcon, pillarOrder, pillarStyle } from "@/components/site/pillars";
-import { Logo } from "@/components/site/Logo";
+import { SiteMark } from "@/components/site/SiteMark";
 
 export async function generateMetadata({
   params,
@@ -71,7 +71,7 @@ export default async function AboutPage({
                 aria-hidden
                 className="bg-motif flex aspect-[4/5] items-center justify-center rounded-3xl border border-line bg-saffron-50"
               >
-                <Logo size={110} />
+                <SiteMark size={110} />
               </div>
             )}
           </div>

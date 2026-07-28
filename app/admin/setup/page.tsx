@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Logo } from "@/components/site/Logo";
+import { SiteMark } from "@/components/site/SiteMark";
 import { PasskeySetup } from "@/components/admin/PasskeySetup";
 
 export const metadata = { title: "Set up administrator" };
@@ -17,7 +17,7 @@ export default async function AdminSetupPage({
       <div className="bg-motif pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative w-full max-w-md rounded-3xl border border-line bg-white p-8 shadow-lift">
         <div className="flex justify-center">
-          <Logo size={56} />
+          <SiteMark size={56} />
         </div>
         <h1 className="font-display mt-5 text-center text-2xl text-ink">
           {inviteToken ? "Accept your admin invitation" : "Set up the first administrator"}

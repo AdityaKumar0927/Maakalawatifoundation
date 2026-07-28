@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Dictionary, Locale } from "@/lib/i18n";
 import { getSettings } from "@/lib/settings";
 import { getContent } from "@/lib/content";
+import { getMedia } from "@/lib/media";
 import { LogoWordmark } from "@/components/site/Logo";
 
 function SocialIcon({ kind }: { kind: "facebook" | "instagram" | "youtube" }) {
@@ -21,7 +22,12 @@ function SocialIcon({ kind }: { kind: "facebook" | "instagram" | "youtube" }) {
 }
 
 export async function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const [settings, copy] = await Promise.all([getSettings(), getContent(locale)]);
+  const [settings, copy, media] = await Promise.all([
+    getSettings(),
+    getContent(locale),
+    getMedia(),
+  ]);
+  const logo = media.get("logo");
   const base = `/${locale}`;
   const f = dict.common.footer;
   const year = String(new Date().getFullYear());
@@ -47,7 +53,7 @@ export async function Footer({ locale, dict }: { locale: Locale; dict: Dictionar
     <footer className="border-t border-line bg-cream-50">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <LogoWordmark locale={locale} />
+          <LogoWordmark locale={locale} logoUrl={logo?.url} logoAlt={logo?.alt} />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-soft">{f.aboutBlurb}</p>
           <p className="font-display mt-4 text-sm text-saffron-700">{dict.common.slogan}</p>
           {socials.length > 0 && (

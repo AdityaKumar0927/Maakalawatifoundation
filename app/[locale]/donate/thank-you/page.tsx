@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDict, isLocale } from "@/lib/i18n";
-import { Logo } from "@/components/site/Logo";
+import { SiteMark } from "@/components/site/SiteMark";
 
 export async function generateMetadata({
   params,
@@ -26,7 +26,7 @@ export default async function ThankYouPage({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center sm:px-6">
-      <Logo size={72} />
+      <SiteMark size={72} />
       <h1 className="font-display mt-8 text-4xl text-ink sm:text-5xl">{dict.donate.thankTitle}</h1>
       <p className="mt-5 text-xl leading-relaxed text-ink-soft">{dict.donate.thankText}</p>
       <div className="mt-9 flex flex-wrap justify-center gap-3">

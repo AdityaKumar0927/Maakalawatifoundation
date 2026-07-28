@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { Logo } from "@/components/site/Logo";
+import { SiteMark } from "@/components/site/SiteMark";
 
 /**
  * First-visit language gate. Deliberately bilingual and dictionary-free:
@@ -17,7 +17,7 @@ export default async function LanguageChooser() {
       />
 
       <div className="relative flex w-full max-w-xl flex-col items-center text-center">
-        <Logo size={72} />
+        <SiteMark size={72} />
 
         <h1 className="font-display mt-8 text-4xl leading-tight text-ink sm:text-5xl">
           Maa Kalawati Foundation

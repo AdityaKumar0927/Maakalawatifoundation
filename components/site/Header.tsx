@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { Dictionary, Locale } from "@/lib/i18n";
+import { getMedia } from "@/lib/media";
 import { LogoWordmark } from "@/components/site/Logo";
 import { LanguageToggle } from "@/components/site/LanguageToggle";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
-export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export async function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const base = `/${locale}`;
+  const logo = (await getMedia()).get("logo");
   const nav = [
     { href: `${base}/about`, label: dict.common.nav.about },
     { href: `${base}/work`, label: dict.common.nav.work },
@@ -17,7 +19,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     <header className="sticky top-0 z-40 border-b border-line bg-cream-100/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 md:h-[4.5rem]">
         <Link href={base} className="shrink-0" aria-label={dict.common.siteName}>
-          <LogoWordmark locale={locale} />
+          <LogoWordmark locale={locale} logoUrl={logo?.url} logoAlt={logo?.alt} />
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">

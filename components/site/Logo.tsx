@@ -37,13 +37,28 @@ export function Logo({ size = 40 }: { size?: number }) {
 export function LogoWordmark({
   locale,
   size = 40,
+  logoUrl,
+  logoAlt,
 }: {
   locale: "en" | "hi";
   size?: number;
+  /** Admin-uploaded logo (MediaSlot "logo"); falls back to the built-in mark. */
+  logoUrl?: string | null;
+  logoAlt?: string;
 }) {
   return (
     <span className="flex items-center gap-3">
-      <Logo size={size} />
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt={logoAlt || ""}
+          className="object-contain"
+          style={{ height: size, width: "auto", maxWidth: size * 2.5 }}
+        />
+      ) : (
+        <Logo size={size} />
+      )}
       {locale === "hi" ? (
         <span lang="hi" className="font-display text-xl leading-tight text-ink">
           माँ कलावती फ़ाउंडेशन
